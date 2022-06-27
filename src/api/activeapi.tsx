@@ -25,3 +25,29 @@ export function logout(){
       
             
 }
+
+/* 获取1级菜单 */
+export function firstmenu(){
+   
+    return axios({
+        method: 'post',
+        url: '/menu/listFirstLevelMenuForUser',
+        baseURL: "/campus/campusweb",
+      })
+      
+            
+}
+
+/* 获取2级菜单 */
+export function othersmenu(query:any){
+   
+    return axios({
+        method: 'post',
+        url: '/menu/listOthersMenuForUser',
+        baseURL: "/campus/campusweb",
+        data: query
+      })
+      
+            
+}
+

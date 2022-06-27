@@ -1,96 +1,66 @@
-import {
-    AppstoreOutlined,
-    BarChartOutlined,
-    CloudOutlined,
-    ShopOutlined,
-    TeamOutlined,
-    UploadOutlined,
-    UserOutlined,
-    VideoCameraOutlined,
-    DownOutlined, SmileOutlined
-  } from '@ant-design/icons';
-
+import {DownOutlined } from '@ant-design/icons';
+import { Layout, Menu,Dropdown,Space,Avatar,Image,message } from 'antd';
 import type { MenuProps } from 'antd';
 import { history } from "umi";
-import { Layout, Menu,Dropdown,Space,Avatar,Image,message } from 'antd';
-import React,{useEffect} from 'react';
+import React,{useEffect,useState} from 'react';
 import Login from '@/pages/login/login';
+import { logout,firstmenu } from '@/api/activeapi';
 import './index.less'
-import { logout } from '@/api/activeapi';
+import Menubar from '@/pages/menu/menu';
 const { Header, Content, Footer, Sider } = Layout;
+/* 登录展示 */
 const onClick: MenuProps['onClick'] = ({ key }) => {
     switch(key){
         case "1" :
-            console.log("1");
         break;
         case "2" :
-            console.log("2");
         break;
         case "3" :
             logout().then(function (response) {
                 const {data:{code}}=response
+                localStorage.removeItem("user")
                 if(code===200){
                     message.success('操作成功')
-                    localStorage.removeItem("user")
                     history.push({
                         pathname:'/active'
                     })
                 }
-                console.log("response",response);
+                console.log("登录成功",response);
             })
               .catch(function (error) {
                 console.log("error",error);
               });
-            
         break;
-    
-    }
-    
-  };
+    } 
+};
+/* 登录账号展示 */
 const menu = (
     <Menu
         onClick={onClick}
-      items={[
-        {
-          key: '1',
-          label: (
-            <p>个人中心</p>
-          ),
-        },
-        {
-          key: '2',
-          label: (
-            <p>修改密码</p>
-          ),
-         /*  icon: <SmileOutlined />, */
-      
-        },
-        {
-          key: '3',
-          danger: true,
-          label: (
-            <p>退出登录</p>
-          ),
-    
-        },
-      ]}
+        items={[
+            {
+                key: '1',
+                label: (
+                    <p>个人中心</p>
+                ),
+            },
+            {
+                key: '2',
+                label: (
+                    <p>修改密码</p>
+                ),
+            },
+            {
+                key: '3',
+                danger: true,
+                label: (
+                    <p>退出登录</p>
+                ),
+            },
+        ]}
     />
   );
 
-const items: MenuProps['items'] = [
-  UserOutlined,
-  VideoCameraOutlined,
-  UploadOutlined,
-  BarChartOutlined,
-  CloudOutlined,
-  AppstoreOutlined,
-  TeamOutlined,
-  ShopOutlined,
-].map((icon, index) => ({
-  key: String(index + 1),
-  icon: React.createElement(icon),
-  label: `nav ${index + 1}`,
-}));
 
 
 
@@ -115,7 +85,15 @@ const Theme=(props:any)=>{
                 }}
             >
                 <div className="logo">logo</div>
-                <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']} items={items} />
+                {/* <Menu 
+                    theme="dark" 
+                    mode="inline" 
+                    openKeys={openKeys} 
+                    defaultSelectedKeys={['1']} 
+                    items={items} 
+                    onOpenChange={onOpenChange}
+                /> */}
+                <Menubar/>
             </Sider>
             <Layout className="site-layout" style={{ marginLeft: 200 ,height:"100%"}}>
                 <Header className="site-layout-background" style={{ padding: 0 }} >
