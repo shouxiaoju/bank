@@ -46,8 +46,37 @@ export function othersmenu(query:any){
         url: '/menu/listOthersMenuForUser',
         baseURL: "/campus/campusweb",
         data: query
-      })
-      
-            
+      })       
 }
 
+/* 获取城市 */
+export function address(query:any){
+   
+  return axios({
+      method: 'post',
+      url: '/address/queryAddressForFourLinkage',
+      baseURL: "/campus/campusweb",
+      data: query
+    })       
+}
+
+export function address2(query:any){
+   
+  return axios({
+      method: 'post',
+      url: '/address/queryAddressForFourLinkage',
+      baseURL: "/campus/campusweb",
+      data: query
+    })       
+}
+
+/* 活动列表 */
+export function activity(query:any){
+   
+  return axios({
+      method: 'post',
+      url: '/activity/pageConditionQueryByCreatorId',
+      baseURL: "/campus/campusweb",
+      data: query
+    })       
+}

@@ -4,7 +4,7 @@ export function onRouteChange(route:any){
     console.log("newPath",newPath);
     
     const islogin=localStorage.getItem("user")
-    if(newPath.length===1||route.location.pathname==="/"||newPath[0].auth&&!islogin){
+    if(newPath.length===1&&route.location.pathname==="/"&&newPath[0].auth&&!islogin){
         history.push({
             pathname:'/login'
         })

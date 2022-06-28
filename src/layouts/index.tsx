@@ -4,7 +4,7 @@ import type { MenuProps } from 'antd';
 import { history } from "umi";
 import React,{useEffect,useState} from 'react';
 import Login from '@/pages/login/login';
-import { logout,firstmenu } from '@/api/activeapi';
+import { logout} from '@/api/activeapi';
 import './index.less'
 import Menubar from '@/pages/menu/menu';
 const { Header, Content, Footer, Sider } = Layout;
@@ -70,6 +70,11 @@ const Theme=(props:any)=>{
     const islogin=localStorage.getItem("user")
     const data=islogin?JSON.parse(islogin):""
     const {location:{pathname}}=props
+    const [titlename,setTitlename]=useState("创建活动")
+
+    const onadd=(key:string)=>{
+        setTitlename(key)
+    }
     return(
         pathname==="/login"
         ?<Login/>
@@ -84,21 +89,13 @@ const Theme=(props:any)=>{
                     bottom: 0,
                 }}
             >
-                <div className="logo">logo</div>
-                {/* <Menu 
-                    theme="dark" 
-                    mode="inline" 
-                    openKeys={openKeys} 
-                    defaultSelectedKeys={['1']} 
-                    items={items} 
-                    onOpenChange={onOpenChange}
-                /> */}
-                <Menubar/>
+                <div className="logo">秦学后台管理</div>
+                <Menubar onadd={onadd}/>
             </Sider>
             <Layout className="site-layout" style={{ marginLeft: 200 ,height:"100%"}}>
                 <Header className="site-layout-background" style={{ padding: 0 }} >
                     <div className='site-layout-header'>
-                        <div>活动</div>
+                        <div>{titlename}</div>
                         <div>
                         <Dropdown overlay={menu}>
                             <Space>
@@ -112,7 +109,7 @@ const Theme=(props:any)=>{
                     </div>
                 </Header>
                 <Content style={{ margin:'0 24px 24px 24px', overflow: 'initial' }}>
-                    <div className="site-layout-menu" style={{ padding: 24, textAlign: 'center' }}>
+                    <div className="site-layout-menu" style={{ padding: 24}}>
                         {props.children}
                     </div>
                 </Content>

@@ -1,7 +1,7 @@
 import {DownOutlined, MailOutlined } from '@ant-design/icons';
 import { Layout, Menu,Dropdown,Space,Avatar,Image,message } from 'antd';
 import type { MenuProps } from 'antd';
-import { history } from "umi";
+import { history,useLocation } from "umi";
 import React,{useEffect,useState} from 'react';
 
 import { firstmenu,othersmenu } from '@/api/activeapi';
@@ -23,10 +23,13 @@ function getItem(
       type,
     } as MenuItem;
   }
-  
-  const Menubar=()=>{
+  /* 获取一级菜单 */
+  const Menubar=(props:any)=>{
+    const{onadd}=props
     const [openKeys, setOpenKeys] = useState(['sub1']);
     const [datalist,setDatalist]=useState([])
+    const [defitem,setDefitem]=useState(["234765385696768976"])
+    const {pathname}=useLocation()
     useEffect(()=>{
         let menulist:any=[]
         firstmenu().then(res=>{
@@ -40,8 +43,8 @@ function getItem(
         }).catch(error=>{
             console.log(error,'error');
         })
-        
     },[])
+    /* 循环获取2级菜单列表 */
     async function formenu(list:any,menulist:any){
         for(let i=0;i<list.length;i++){
             let query=list[i].menuId
@@ -53,12 +56,12 @@ function getItem(
             })
         }
     }
+    /* 处理获取到的菜单数据生产左侧菜单 */
     const items: MenuItem[] = datalist.map((item:any,index:any)=>{
        return getItem(item.menuName, 'sub1', <MailOutlined />,item.data1.map((item1:any)=>{
            return  getItem(item1.menuName, item1.menuId)
        }))
     })
-    console.log("items",items);
     const rootSubmenuKeys = ['sub1'];
     const onOpenChange: MenuProps['onOpenChange'] = keys => {
         const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
@@ -69,14 +72,37 @@ function getItem(
         }
       };
 
+
+    /* 获取当前地址判断展示的内容 */
+    const onmenuclick=({ key }:any)=>{
+      
+      if(key==="102"){
+        onadd("抽奖白名单")
+        history.push({
+          pathname:'/luck'
+        })
+      }else if(key==="234765385696768976"){
+        onadd("创建活动")
+        history.push({
+          pathname:'/active'
+        })
+      }else if(key==="344547686666666649"){
+        onadd("活动评论")
+        history.push({
+          pathname:'/comment'
+        })
+      } 
+    }
     return(
         <Menu 
             theme="dark" 
             mode="inline" 
             openKeys={openKeys} 
-            defaultSelectedKeys={['234765385696768976']} 
+            defaultSelectedKeys={defitem} 
             items={items} 
             onOpenChange={onOpenChange}
+            onClick={onmenuclick}
+            /* selectedKeys={defitem} */
         />
     )
   }
