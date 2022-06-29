@@ -80,3 +80,15 @@ export function activity(query:any){
       data: query
     })       
 }
+
+/* 活动详情 */
+
+export function activitylist(query:any){
+   
+  return axios({
+      method: 'post',
+      url: '/activity/queryByUpdate',
+      baseURL: "/campus/campusweb",
+      data: query
+    })       
+}

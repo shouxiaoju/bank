@@ -38,10 +38,9 @@ function getItem(
                 menulist.push(data)
                 formenu(data,menulist)
             }
-            console.log(res,'一级导航');
-            
+            console.log("获取导航成功",res);
         }).catch(error=>{
-            console.log(error,'error');
+            console.log("获取导航失败",error);
         })
     },[])
     /* 循环获取2级菜单列表 */
@@ -52,7 +51,6 @@ function getItem(
                 const {data:{code,data}}=res
                 list[i].data1=data
                 setDatalist(list)
-                console.log('二级级导航',res,list);
             })
         }
     }

@@ -25,9 +25,10 @@ const onClick: MenuProps['onClick'] = ({ key }) => {
                         pathname:'/active'
                     })
                 }
-                console.log("登录成功",response);
             })
               .catch(function (error) {
+                localStorage.removeItem("user")
+                message.error("操作失败！错误信息："+error.message);
                 console.log("error",error);
               });
         break;
@@ -61,20 +62,64 @@ const menu = (
     />
   );
 
-
-
-
-
-
 const Theme=(props:any)=>{
+    console.log("propsprops",props);
     const islogin=localStorage.getItem("user")
     const data=islogin?JSON.parse(islogin):""
-    const {location:{pathname}}=props
-    const [titlename,setTitlename]=useState("创建活动")
+    const {location:{pathname},route}=props
+    const [titlename,setTitlename]=useState([])
 
     const onadd=(key:string)=>{
-        setTitlename(key)
+        setTitlename((pretit):any=>{
+            let arr=[]
+            arr.push(key)
+            return arr
+        })
     }
+
+    useEffect(()=>{
+        console.log("改变了",pathname);
+        
+        if(route.path===pathname){
+            return
+        }else{
+           console.log("递归",digui(route.routes,pathname));
+           let key=digui(route.routes,pathname)
+           if(!titlename.includes(key)){
+            setTitlename((pretit):any=>{
+                let arr1=[...pretit]
+                arr1.push(key)
+                return arr1
+            })
+           }
+           
+        }
+        
+    },[pathname])
+const digui=(rout:any,path:any)=>{
+    let arr2=""
+    function find(cityData:any,id:any){
+        for (let i = 0; i < cityData.length; i++) {
+            if (cityData[i].path === id) {
+                arr2 = cityData[i].title
+                break
+            }
+            if (cityData[i].routes && cityData[i].routes.length > 0) {
+                find(cityData[i].routes, id);
+            }
+        }
+        return arr2
+    }
+    return find(rout,path)
+}
+const goback=(item:any)=>{
+    console.log(item);
+
+   /*  switch(item){
+       
+    } */
+    
+}
     return(
         pathname==="/login"
         ?<Login/>
@@ -95,7 +140,19 @@ const Theme=(props:any)=>{
             <Layout className="site-layout" style={{ marginLeft: 200 ,height:"100%"}}>
                 <Header className="site-layout-background" style={{ padding: 0 }} >
                     <div className='site-layout-header'>
-                        <div>{titlename}</div>
+                        
+                        <div className='site-layoutitle'>
+                            {
+                                titlename.map((item:any, index:any)=>{
+                                    return <span 
+                                                key={index} 
+                                                className={`${index===titlename.length-1?"site-layoutspan":""}`} 
+                                            >
+                                                {`${index===titlename.length-1&&index!==0?"/":""}`} {item} 
+                                            </span>
+                                })
+                            }
+                        </div>
                         <div>
                         <Dropdown overlay={menu}>
                             <Space>

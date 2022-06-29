@@ -19,10 +19,11 @@ const Login=()=>{
                     pathname:'/active'
                 })
             }
-            console.log("response",response);
+            console.log("登录成功",response);
           })
           .catch(function (error) {
-            console.log("error",error);
+            message.error("登录失败！错误信息："+error.message);
+            console.log("登录失败",error);
           });
       };
      const encrypt = (plaintText:any) => { 
