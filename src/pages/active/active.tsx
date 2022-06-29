@@ -12,7 +12,6 @@ import { history } from "umi";
 const Active=(props:any)=>{
     
     const {location:{pathname},route}=props
-    console.log(pathname==="/active/details")
     const[tabname,setTabname]=useState("0")
     const[activityName,setActivityName]=useState("")
     const[queryStartDate,setQueryStartDate]=useState("")

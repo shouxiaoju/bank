@@ -63,12 +63,12 @@ const menu = (
   );
 
 const Theme=(props:any)=>{
-    console.log("propsprops",props);
+
     const islogin=localStorage.getItem("user")
     const data=islogin?JSON.parse(islogin):""
     const {location:{pathname},route}=props
     const [titlename,setTitlename]=useState([])
-
+    let dizhi= pathname.split("/")
     const onadd=(key:string)=>{
         setTitlename((pretit):any=>{
             let arr=[]
@@ -78,48 +78,47 @@ const Theme=(props:any)=>{
     }
 
     useEffect(()=>{
-        console.log("改变了",pathname);
-        
         if(route.path===pathname){
             return
         }else{
-           console.log("递归",digui(route.routes,pathname));
-           let key=digui(route.routes,pathname)
-           if(!titlename.includes(key)){
-            setTitlename((pretit):any=>{
-                let arr1=[...pretit]
-                arr1.push(key)
-                return arr1
-            })
-           }
-           
+            let str=""
+            let arrstr=[]
+            for(let i=1;i<dizhi.length;i++){
+                str+="/"+dizhi[i]
+                arrstr.push(digui(route.routes,str))
+            }
+            setTitlename(arrstr)
         }
         
     },[pathname])
-const digui=(rout:any,path:any)=>{
-    let arr2=""
-    function find(cityData:any,id:any){
-        for (let i = 0; i < cityData.length; i++) {
-            if (cityData[i].path === id) {
-                arr2 = cityData[i].title
-                break
+    /* 递归取数据 */
+    const digui=(rout:any,path:any)=>{
+        let arr2=""
+        function find(cityData:any,id:any){
+            for (let i = 0; i < cityData.length; i++) {
+                if (cityData[i].path === id) {
+                    arr2 = cityData[i].title
+                    break
+                }
+                if (cityData[i].routes && cityData[i].routes.length > 0) {
+                    find(cityData[i].routes, id);
+                }
             }
-            if (cityData[i].routes && cityData[i].routes.length > 0) {
-                find(cityData[i].routes, id);
-            }
+            return arr2
         }
-        return arr2
+        return find(rout,path)
     }
-    return find(rout,path)
-}
-const goback=(item:any)=>{
-    console.log(item);
-
-   /*  switch(item){
-       
-    } */
-    
-}
+    /* 点击跳转 */
+    const goback=(index:any)=>{
+        let newstr=""
+        let newarr=dizhi.slice(1,2+index)
+        for(let i=0;i<newarr.length;i++){
+            newstr+="/"+newarr[i]
+        }
+        history.push({
+            pathname:newstr
+        })
+    }
     return(
         pathname==="/login"
         ?<Login/>
@@ -147,6 +146,7 @@ const goback=(item:any)=>{
                                     return <span 
                                                 key={index} 
                                                 className={`${index===titlename.length-1?"site-layoutspan":""}`} 
+                                                onClick={index===titlename.length-1?null:()=>{goback(index)}}
                                             >
                                                 {`${index===titlename.length-1&&index!==0?"/":""}`} {item} 
                                             </span>
