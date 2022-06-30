@@ -1,25 +1,19 @@
-import { Button, TreeSelect, Form, Input,Row ,Col,Cascader } from 'antd';
-import type { TreeSelectProps } from 'antd';
-import type { DefaultOptionType } from 'antd/es/select';
+import {  DatePicker, Form, Input,Row ,Col,Cascader,Button, Upload,Space} from 'antd';
+import { PlusOutlined ,LoadingOutlined,MinusCircleOutlined} from '@ant-design/icons'
+import type { UploadChangeParam } from 'antd/es/upload';
+import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
 import React,{useState,useEffect} from 'react';
 import { address,address2 } from '@/api/activeapi';
-
+import 'moment/locale/zh-cn';
+import locale from 'antd/es/date-picker/locale/zh_CN';
+import './basicfrom.less'
+const { RangePicker }:any = DatePicker;
+const { TextArea } = Input;
 
 
 
 const Basicfrom = () => {
-
-    
-
-    
-
-
-
-
-  
- 
-/* 处理城市接口数据 */
-
+    /* 处理城市接口数据 */
     const [options, setOptions] = useState([]);
     const onChange = (value:any , selectedOptions:any ) => {
         console.log("onChange",value, selectedOptions);
@@ -81,38 +75,222 @@ const Basicfrom = () => {
     const onFinishFailed = (errorInfo:any) => {
         console.log('Failed:', errorInfo);
     };
+    /* 活动图 */
+
+    const [loading1, setLoading1] = useState(false);
+    const [imageUrl1, setImageUrl1] = useState<string>();
+  
+
+    const getBase64 = (img: RcFile, callback: (url: string) => void) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => callback(reader.result as string));
+        reader.readAsDataURL(img);
+      };
+      
+
+    const handleChange1: UploadProps['onChange'] = (info: UploadChangeParam<UploadFile>) => {
+        console.log("info",info);
+        
+      if (info.file.status === 'uploading') {
+        setLoading1(true);
+        return;
+      }
+      if (info.file.status === 'done') {
+        // Get this url from response in real world.
+        getBase64(info.file.originFileObj as RcFile, url => {
+          setLoading1(false);
+          setImageUrl1(url);
+        });
+      }
+      if (info.file.status === 'removed'){
+        setImageUrl1("")
+      }
+    };
+  
+    const uploadButton1 = (
+      <div>
+        {loading1 ? <LoadingOutlined /> : <PlusOutlined />}
+        <div style={{ marginTop: 8 }}>Upload</div>
+      </div>
+    );
+    
+    /* 缩略图 */
+
+    const [loading2, setLoading2] = useState(false);
+    const [imageUrl2, setImageUrl2] = useState<string>();
+
+    
+    const handleChange2: UploadProps['onChange'] = (info: UploadChangeParam<UploadFile>) => {
+        console.log("info",info);
+        
+      if (info.file.status === 'uploading') {
+        setLoading2(true);
+        return;
+      }
+      if (info.file.status === 'done') {
+        // Get this url from response in real world.
+        getBase64(info.file.originFileObj as RcFile, url => {
+          setLoading2(false);
+          setImageUrl2(url);
+        });
+      }
+      if (info.file.status === 'removed'){
+        setImageUrl2("")
+      }
+    };
+  
+    const uploadButton2 = (
+      <div>
+        {loading2 ? <LoadingOutlined /> : <PlusOutlined />}
+        <div style={{ marginTop: 8 }}>Upload</div>
+      </div>
+    );
 
   return (
-    <Form
-      name="basic"
-      colon={false}
-      layout="vertical"
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
-    >
-    <Row>
-      <Col span={12}>
-        <Form.Item
-            name="name"
-            label="活动名称"
-            rules={[{ required: true, message: 'Please input your username!' }]}
+      <div className='baisform'>
+        <Form
+            name="basic"
+            colon={false}
+            layout="vertical"
+            onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
         >
-            <Input placeholder="请输入活动名称" />
-        </Form.Item>
-      </Col>
-      <Col span={12}>
-        <Form.Item label="地区选择">
-            <Cascader placeholder="请选择活动所属地" options={options} loadData={loadData} onChange={onChange}  />
-        </Form.Item>
-      </Col>
-      <Col span={12}>
-        <Form.Item label="所属分行">
+        <Row>
+            <Col span={12}>
+                <Form.Item
+                    label="活动名称"
+                    rules={[{ required: true, message: '请输入活动名称' }]}
+                >
+                    <Input placeholder="请输入活动名称" />
+                </Form.Item>
+            </Col>
+            <Col span={12}>
+                <Form.Item 
+                    label="地区选择" 
+                    rules={[{ required: true, message: '请选择活动所属地' }]}
+                >
+                    <Cascader placeholder="请选择活动所属地" options={options} loadData={loadData} onChange={onChange}  />
+                </Form.Item>
+            </Col>
+            <Col span={12}>
+                <Form.Item 
+                    label="活动时间"
+                    rules={[{ required: true, message: '请选择活动时间' }]}
+                >
+                    <RangePicker locale={locale} />
+                </Form.Item>
+            </Col>
+            <Col span={12}>
+                <Form.Item 
+                    label="活动地点"
+                >
+                    <Input placeholder="请输入活动地点" />
+                </Form.Item>
+            </Col>
+            <Col span={12}>
+                <Form.Item 
+                    label="活动主办方"
+                >
+                    <Input placeholder="请输入活动主办方" />
+                </Form.Item>
+            </Col>
+            <Col span={12}>
+                <Form.Item 
+                    label="活动内容"
+                >
+                    <TextArea rows={4} placeholder="请输入活动内容" maxLength={6} />
+                </Form.Item>
+            </Col>
+            <Col span={12}>
+                <Form.Item 
+                    label="活动图"
+                    className='baisform_item1'
+                >
+                    <Upload
+                        name="avatar"
+                        listType="picture-card"
+                        className="avatar-uploader"
+                        showUploadList={false}
+                        onChange={handleChange1}
+                    >
+                        {imageUrl1 ?
+                            <img src={imageUrl1}  style={{ width: '100%' }} />
+                        : uploadButton1}
+                    </Upload>
+                </Form.Item>
+            </Col>
+            <Col span={12}>
+                <Form.Item 
+                    label="缩略图"
+                    className='baisform_item2'
+                >
+                    <Upload
+                        name="avatar"
+                        listType="picture-card"
+                        className="avatar-uploader"
+                        showUploadList={false}
+                        onChange={handleChange2}
+                    >
+                        {imageUrl2 ?
+                            <img src={imageUrl2}  style={{ width: '100%' }} />
+                        : uploadButton2}
+                    </Upload>
+                </Form.Item>
+            </Col>
+            <Col span={24} >
+                <div className='baisform_div'>
+                    <span>请编辑活动日程规划</span><span>（可添加多条）</span>
+                </div>
+                <Row>
+                    <Col span={12} >
+                        <Form.Item label="日程名称">
+                            <Input placeholder="请输入日程名称" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6} >
+                        <Form.Item label=" ">
+                            <DatePicker placeholder="请选择日程日期" locale={locale}/>
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Form.List name="users">
+        {(fields, { add, remove }) => (
+          <>
+            {fields.map(({ key, name, ...restField }) => (
+                <Row key={key}>
+                    <Col span={12} >
+                        <Form.Item
+                            {...restField}
+                            name={[name, 'first']}        
+                        >
+                            <Input placeholder="请输入日程名称" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6} >
+                        <Form.Item
+                            {...restField}
+                            name={[name, 'last']}
+                            rules={[{ required: true, message: 'Missing last name' }]}
+                        >
+                            <DatePicker placeholder="请选择日程日期" locale={locale} />
+                        </Form.Item>
+                    </Col>
+                    <MinusCircleOutlined onClick={() => remove(name)} />
+                </Row>
+            ))}
+            <Form.Item>
+              <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                添加
+              </Button>
+            </Form.Item>
+          </>
+        )}
+      </Form.List>
+            </Col>
+        </Row>
         
-        </Form.Item>
-      </Col>
-    </Row>
-       
-    </Form>
+        </Form>
+    </div>
   );
 };
 

@@ -23,7 +23,6 @@ const Active=(props:any)=>{
       };
     /* 新增 */
     const newadd=()=>{
-        console.log("新增");
         history.push({
             pathname:'/active/newadd',
         })
