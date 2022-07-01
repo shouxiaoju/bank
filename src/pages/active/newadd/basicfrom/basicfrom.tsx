@@ -2,7 +2,7 @@ import {  DatePicker, Form, Input,Row ,Col,Cascader,Button, Upload,Space} from '
 import { PlusOutlined ,LoadingOutlined,MinusCircleOutlined} from '@ant-design/icons'
 import type { UploadChangeParam } from 'antd/es/upload';
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
-import React,{useState,useEffect} from 'react';
+import React,{useState,useEffect,forwardRef,useImperativeHandle} from 'react';
 import { address,address2 } from '@/api/activeapi';
 import 'moment/locale/zh-cn';
 import locale from 'antd/es/date-picker/locale/zh_CN';
@@ -12,9 +12,10 @@ const { TextArea } = Input;
 
 
 
-const Basicfrom = () => {
+const Basicfrom = (props:any,ref:any) => {
     /* 处理城市接口数据 */
     const [options, setOptions] = useState([]);
+    const {tabfrom,gettotal}=props
     const onChange = (value:any , selectedOptions:any ) => {
         console.log("onChange",value, selectedOptions);
     };
@@ -68,13 +69,24 @@ const Basicfrom = () => {
     },[])
 
     /* 表单1操作数据 */
-    const onFinish = (values:any) => {
-        console.log('Success:', values);
-    };
+    useImperativeHandle(ref,()=>{
+        return {
+            submit
+        }
+    })
+    const [form] = Form.useForm();
+    const submit=()=>{
+        form.validateFields().then((value)=>{
+            console.log("validateFields",value);
+            gettotal(value)
+            tabfrom("2")
+        })
+        .catch((errorInfo)=>{
+            console.log("errorInfo",errorInfo);
+            
+        })
+    }
 
-    const onFinishFailed = (errorInfo:any) => {
-        console.log('Failed:', errorInfo);
-    };
     /* 活动图 */
 
     const [loading1, setLoading1] = useState(false);
@@ -119,7 +131,13 @@ const Basicfrom = () => {
     const [loading2, setLoading2] = useState(false);
     const [imageUrl2, setImageUrl2] = useState<string>();
 
-    
+    const normFile = (e:any) => {  //如果是typescript, 那么参数写成 e: any
+        console.log('Upload event:', e);
+        if (Array.isArray(e)) {
+          return e;
+        }
+        return e && e.fileList;
+      };
     const handleChange2: UploadProps['onChange'] = (info: UploadChangeParam<UploadFile>) => {
         console.log("info",info);
         
@@ -149,16 +167,16 @@ const Basicfrom = () => {
   return (
       <div className='baisform'>
         <Form
-            name="basic"
+            /* name="basic" */
             colon={false}
             layout="vertical"
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
+            form={form}
         >
         <Row>
             <Col span={12}>
                 <Form.Item
                     label="活动名称"
+                    name="activityName"
                     rules={[{ required: true, message: '请输入活动名称' }]}
                 >
                     <Input placeholder="请输入活动名称" />
@@ -167,6 +185,7 @@ const Basicfrom = () => {
             <Col span={12}>
                 <Form.Item 
                     label="地区选择" 
+                    name="cityCode"
                     rules={[{ required: true, message: '请选择活动所属地' }]}
                 >
                     <Cascader placeholder="请选择活动所属地" options={options} loadData={loadData} onChange={onChange}  />
@@ -175,6 +194,7 @@ const Basicfrom = () => {
             <Col span={12}>
                 <Form.Item 
                     label="活动时间"
+                    name="Date"
                     rules={[{ required: true, message: '请选择活动时间' }]}
                 >
                     <RangePicker locale={locale} />
@@ -183,6 +203,7 @@ const Basicfrom = () => {
             <Col span={12}>
                 <Form.Item 
                     label="活动地点"
+                    name="activitySite"
                 >
                     <Input placeholder="请输入活动地点" />
                 </Form.Item>
@@ -190,6 +211,7 @@ const Basicfrom = () => {
             <Col span={12}>
                 <Form.Item 
                     label="活动主办方"
+                    name="activityOrganizers"
                 >
                     <Input placeholder="请输入活动主办方" />
                 </Form.Item>
@@ -197,6 +219,7 @@ const Basicfrom = () => {
             <Col span={12}>
                 <Form.Item 
                     label="活动内容"
+                    name="activityContent"
                 >
                     <TextArea rows={4} placeholder="请输入活动内容" maxLength={6} />
                 </Form.Item>
@@ -205,6 +228,8 @@ const Basicfrom = () => {
                 <Form.Item 
                     label="活动图"
                     className='baisform_item1'
+                    name="pictureUrl"
+                    valuePropName="fileList1" 
                 >
                     <Upload
                         name="avatar"
@@ -222,7 +247,10 @@ const Basicfrom = () => {
             <Col span={12}>
                 <Form.Item 
                     label="缩略图"
+                    name="thumbnailPictureUrl"
                     className='baisform_item2'
+                    valuePropName="fileList" 
+                    getValueFromEvent={normFile}
                 >
                     <Upload
                         name="avatar"
@@ -230,6 +258,7 @@ const Basicfrom = () => {
                         className="avatar-uploader"
                         showUploadList={false}
                         onChange={handleChange2}
+                       
                     >
                         {imageUrl2 ?
                             <img src={imageUrl2}  style={{ width: '100%' }} />
@@ -243,41 +272,41 @@ const Basicfrom = () => {
                 </div>
                 <Row>
                     <Col span={12} >
-                        <Form.Item label="日程名称">
+                        <Form.Item label="日程名称" name="schedulesname">
                             <Input placeholder="请输入日程名称" />
                         </Form.Item>
                     </Col>
                     <Col span={6} >
-                        <Form.Item label=" ">
+                        <Form.Item label=" " name="schedulesdata">
                             <DatePicker placeholder="请选择日程日期" locale={locale}/>
                         </Form.Item>
                     </Col>
                 </Row>
                 <Form.List name="users">
-        {(fields, { add, remove }) => (
-          <>
-            {fields.map(({ key, name, ...restField }) => (
-                <Row key={key}>
-                    <Col span={12} >
-                        <Form.Item
-                            {...restField}
-                            name={[name, 'first']}        
-                        >
-                            <Input placeholder="请输入日程名称" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={6} >
-                        <Form.Item
-                            {...restField}
-                            name={[name, 'last']}
-                            rules={[{ required: true, message: 'Missing last name' }]}
-                        >
-                            <DatePicker placeholder="请选择日程日期" locale={locale} />
-                        </Form.Item>
-                    </Col>
-                    <MinusCircleOutlined onClick={() => remove(name)} />
-                </Row>
-            ))}
+                    {(fields, { add, remove }) => (
+                    <>
+                        {fields.map(({ key, name, ...restField }) => (
+                            <Row key={key}>
+                                <Col span={12} >
+                                    <Form.Item
+                                        {...restField}
+                                        name={[name, 'first']}        
+                                    >
+                                        <Input placeholder="请输入日程名称" />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={6} >
+                                    <Form.Item
+                                        {...restField}
+                                        name={[name, 'last']}
+                                        rules={[{ required: true, message: 'Missing last name' }]}
+                                    >
+                                        <DatePicker placeholder="请选择日程日期" locale={locale} />
+                                    </Form.Item>
+                                </Col>
+                                <MinusCircleOutlined onClick={() => remove(name)} />
+                            </Row>
+                        ))}
             <Form.Item>
               <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
                 添加
@@ -294,4 +323,4 @@ const Basicfrom = () => {
   );
 };
 
-export default Basicfrom;
+export default forwardRef(Basicfrom);

@@ -2,7 +2,7 @@ import { Button } from 'antd';
 import React,{useState,useEffect} from 'react';
 import './addfoote.less'
 const Addfooter=(props:any)=>{
-    const {nonefrom,tabfrom}=props
+    const {nonefrom,tabfrom,getform1}=props
     const[butname,setButname]=useState(["发布","上一步","下一步","预览","保存草稿"])
     useEffect(()=>{
         if(nonefrom==="1"){
@@ -15,9 +15,13 @@ const Addfooter=(props:any)=>{
 
     const onfooter=(item:any)=>{
         if(item==="下一步"){
-            tabfrom("2")
+            getform1()
+           // tabfrom("2")
+
         }else if(item==="上一步"){
             tabfrom("1")
+        }else if(item==="发布"){
+            
         }
         
     }

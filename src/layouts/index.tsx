@@ -21,10 +21,11 @@ const onClick: MenuProps['onClick'] = ({ key }) => {
                 localStorage.removeItem("user")
                 if(code===200){
                     message.success('操作成功')
-                    history.push({
-                        pathname:'/active'
-                    })
+                    
                 }
+                history.push({
+                    pathname:'/login'
+                })
             })
               .catch(function (error) {
                 localStorage.removeItem("user")
