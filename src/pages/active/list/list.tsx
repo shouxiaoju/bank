@@ -136,9 +136,9 @@ const Activity=(props:any)=>{
     /* 调用接口 */
     const getlist=(obj:any)=>{
         activity(obj).then(res=>{
-            console.log('接口返回的列表内容',res);
-            const {data:{code,data:{rows,total}}}=res
+            const {data:{code}}=res
             if(code===200){
+                const {data:{data:{rows,total}}}=res
                 let arr1: {
                     creator: any; //创建人
                     activityName: any; //名称
@@ -159,8 +159,11 @@ const Activity=(props:any)=>{
                 })
                 setLoading(false)
                 setPagination({ total:total  })
-                console.log('处理后的列表数据',arr1);
                 setData(arr1)
+            }else if(code===302){
+                history.push({
+                    pathname:'/login',
+                })
             }
         })
     }

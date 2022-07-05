@@ -30,18 +30,15 @@ const Active=(props:any)=>{
     }
     /* 搜索 */
     const onsearch=(name:any)=>{
-        console.log("搜索",name);
         setActivityName(name.name)
         if(name.time){
             setQueryStartDate(formatDate(name.time[0]._d))
             setQueryEndDate(formatDate(name.time[1]._d))
         }
-        
     }
 
     /* 重置 */
     const onrest=()=>{
-        console.log("重置");
         setActivityName("")
         setQueryStartDate("")
         setQueryEndDate("")

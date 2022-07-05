@@ -35,8 +35,7 @@ const Newadd=(props:any)=>{
               setGoback(data)
             }
         })
-        }
-        
+        } 
     },[])
 
       const tabfrom=(key:any)=>{//上一页下一页
@@ -49,7 +48,6 @@ const Newadd=(props:any)=>{
       }
         /* 获取表单1的数据 */
        const gettotal=(cont:any)=>{
-        console.log("表单1的数据",cont);
          let arr:any=[]
          cont.users?cont.users.map((item:any)=>{
             arr.push({
@@ -73,7 +71,6 @@ const Newadd=(props:any)=>{
           "thumbnailPictureUrl":cont.thumbnailPictureUrl[0].response.data.imgUrl,
          }
         
-        console.log("表单1处理后的数据",obj);
         setTotul(obj)
       }
     /* 处理日期 */
@@ -95,7 +92,6 @@ const Newadd=(props:any)=>{
         /* 触发表单二的提交 */
       const ceshiref2=useRef(null)
       const getform2=(key:any)=>{
-        console.log("ceshiref2",ceshiref2);
         ceshiref2.current.submit(key)
       }
 

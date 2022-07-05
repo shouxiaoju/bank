@@ -6,7 +6,6 @@ import CryptoJS from 'crypto-js';
 import { login } from '@/api/activeapi';
 const Login=()=>{
     const onFinish = (values: any) => {
-        console.log('Received values of form: ', values);
         let {username,password}=values
         let paswor=encrypt(password)
         let key={"userAccount":username,"userPwd":paswor}
@@ -19,7 +18,6 @@ const Login=()=>{
                     pathname:'/active'
                 })
             }
-            console.log("登录成功",response);
           })
           .catch(function (error) {
             message.error("登录失败！错误信息："+error.message);

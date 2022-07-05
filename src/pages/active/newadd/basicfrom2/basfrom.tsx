@@ -58,7 +58,6 @@ import moment from 'moment';
         },[total])
 
         function  submit(key:any){
-            console.log("提交",key);
             let arr=[]
             for(let i=0;i<icon.length;i++){
                 if(icon[i]==="1"){
@@ -68,7 +67,6 @@ import moment from 'moment';
                 }
             }
             Promise.all(arr).then((res)=>{
-                console.log("promise.all",res);
                 let newarr={...totaldata}
                 for(let i=0;i<res.length;i++){
                     if(res[i]["catynum"]){
@@ -95,7 +93,6 @@ import moment from 'moment';
                                 "optionalEntryForms":arr2
                             }
                         )
-                        console.log("表单2-1处理后的数据",newarr);
                     }
                      if(res[i]["ovteTime"]){
                         let arr1:any=[]
@@ -115,12 +112,10 @@ import moment from 'moment';
                                 "voteWay": res[i].ovteWay=="1"?res[i].ovteWay:"1",
                                 "voteObjectVOS":arr1
                             })
-                        console.log("表单2-2处理后的数据",newarr);
                     }
                 }
                 if(key==="发布"){
                     addactivitylist(newarr).then((res):any=>{
-                        console.log("新增成功",res);
                         const{data:{code}}=res
                         if(code===200){
                             message.success('发布成功')
@@ -135,17 +130,15 @@ import moment from 'moment';
                         console.log("新增失败",erray);
                     })
                 }else if(key==="保存草稿"){
-                    console.log("保存草稿newarr",newarr);
+                    let title="保存草稿箱成功"
                     if(Object.keys(goback).length>0){
-                        console.log("newarr",newarr);
-                        
                         newarr["activityBasicId"]=goback.activityBasicId
+                        title="编辑草稿箱成功"
                     }
                     addasaveDrafts(newarr).then((res):any=>{
-                        console.log("保存草稿成功",res);
                         const{data:{code}}=res
                         if(code===200){
-                            message.success('保存草稿箱成功')
+                            message.success(title)
                             history.push({
                                 pathname:'/active'
                             })
@@ -154,7 +147,6 @@ import moment from 'moment';
                         }
                     }).catch((erray):any=>{
                         console.log("保存草稿成功",erray);
-                        
                     })
                 }
             })
@@ -205,7 +197,6 @@ import moment from 'moment';
 
 
         useEffect(()=>{
-            console.log("表单2回填",goback);
             if(goback["isSignUp"]){
                 if(goback.isSignUp){
                     setIcon((pericon):any=>{
@@ -231,7 +222,6 @@ import moment from 'moment';
                         return arr1
                     })
                 }
-                
             }
             if(Object.keys(goback).length>0){
                 goback.activityVOS.map((item:any)=>{
@@ -247,14 +237,11 @@ import moment from 'moment';
                                 "first":item2.key
                             })
                         })
-                        console.log(newarr);
-                        
                         obj1["datatime"]=[moment(item.startDate),moment(item.endDate)]
                         obj1["catynum"]=item.numberLimit
                         obj1["check"]={checkcount:newarr}
                         obj1["users"]=usersarr
                         form1.setFieldsValue(obj1)
-                        console.log("form2",form2);
                     } 
                     if(item.activityType==2){
                         let obj2:any={}
@@ -278,8 +265,6 @@ import moment from 'moment';
                         obj2["ovteTime"]=[moment(item.startDate),moment(item.endDate)]
                         obj2["ovteWay"]=item.voteWay==1?"只可投一次":""
                         obj2["users"]=userstex
-                        
-                        
                         form2.setFieldsValue(obj2)
                     }
                 })
@@ -492,7 +477,7 @@ import moment from 'moment';
                                                         getValueFromEvent={normFile}
                                                         rules={[{ required: true, message: '请上传图片' }]}  
                                                         extra={
-                                                           <div>png格式</div>
+                                                           <div>支持扩展名：jpg、jepg、png</div>
                                                         }                  
                                                     >
                                                         <Upload

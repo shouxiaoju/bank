@@ -38,7 +38,6 @@ function getItem(
                 menulist.push(data)
                 formenu(data,menulist)
             }
-            console.log("获取导航成功",res);
         }).catch(error=>{
             console.log("获取导航失败",error);
         })

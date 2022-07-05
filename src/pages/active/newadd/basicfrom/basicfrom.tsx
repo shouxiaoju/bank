@@ -231,7 +231,7 @@ const Basicfrom = (props:any,ref:any) => {
                             getValueFromEvent={normFile}
                             rules={[{ required: true, message: '请上传活动图片' }]}
                             extra={
-                                <div>png格式</div>
+                                <div>推荐尺寸: 1035*261</div>
                             }
                         >
                             <Upload
@@ -251,7 +251,7 @@ const Basicfrom = (props:any,ref:any) => {
                             getValueFromEvent={normFile}
                             rules={[{ required: true, message: '请上传缩略图' }]}
                             extra={
-                            <div>png格式</div>
+                            <div>推荐尺寸: 168*261</div>
                             }
                         >
                             <Upload
