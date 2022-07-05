@@ -23,12 +23,12 @@ import { activitylist } from '@/api/activeapi';
 
 const Newadd=(props:any)=>{
       const {location:{query}}=props
-      const [total,setTotul]=useState({})
-      const [nonefrom,setNonefrom]=useState("1")
-      const [goback,setGoback]=useState({})
+      const [total,setTotul]=useState({})//表单1基本信息处理后的数据，给活动信息进行合并
+      const [nonefrom,setNonefrom]=useState("1")//展示基本信息(1),还是活动信息(2)
+      const [goback,setGoback]=useState({})//回显数据
 
       useEffect(()=>{
-        if(query["activityBasicId"]){
+        if(query["activityBasicId"]){//判断是否有activityBasicId如果有获取回显数据
           activitylist({"activityBasicId":query.activityBasicId}).then((res)=>{
             const {data:{code,data}}=res
             if(code===200){
@@ -39,7 +39,7 @@ const Newadd=(props:any)=>{
         
     },[])
 
-      const tabfrom=(key:any)=>{
+      const tabfrom=(key:any)=>{//上一页下一页
           setNonefrom(key)
       }
       const ceshiref1=useRef(null)
@@ -49,10 +49,8 @@ const Newadd=(props:any)=>{
       }
         /* 获取表单1的数据 */
        const gettotal=(cont:any)=>{
-         let arr=[{
-          "scheduleName": cont.schedulesname,
-          "scheduleDate":cont.schedulesdata?formatDateTime(cont.schedulesdata._d):""
-         }]
+        console.log("表单1的数据",cont);
+         let arr:any=[]
          cont.users?cont.users.map((item:any)=>{
             arr.push({
               "scheduleName": item.first,
@@ -74,13 +72,12 @@ const Newadd=(props:any)=>{
           "thumbnailPictureKey":cont.thumbnailPictureUrl[0].response.data.imgKey,
           "thumbnailPictureUrl":cont.thumbnailPictureUrl[0].response.data.imgUrl,
          }
-        console.log("表单1的数据",cont);
+        
         console.log("表单1处理后的数据",obj);
         setTotul(obj)
       }
-      /* 处理日期 */
-
-      var formatDateTime = function (date:any) {
+    /* 处理日期 */
+    var formatDateTime = function (date:any) {
         var y = date.getFullYear(); 
         var m = date.getMonth() + 1;  
         m = m < 10 ? ('0' + m) : m;  
@@ -93,7 +90,7 @@ const Newadd=(props:any)=>{
         var second=date.getSeconds();  
         second=second < 10 ? ('0' + second) : second;  
         return y + '-' + m + '-' + d+' '+h+':'+minute; 
-      }
+    }
 
         /* 触发表单二的提交 */
       const ceshiref2=useRef(null)
@@ -101,6 +98,7 @@ const Newadd=(props:any)=>{
         console.log("ceshiref2",ceshiref2);
         ceshiref2.current.submit(key)
       }
+
     return(
         <div className="newadd">
             <div className="title">
@@ -118,7 +116,7 @@ const Newadd=(props:any)=>{
                 <Basicfrom ref={ceshiref1} tabfrom={tabfrom} gettotal={gettotal} goback={goback}/>
               </div>
               <div style={{display:`${nonefrom==="2"?"block":"none"}`}}>
-                <Basfrom ref={ceshiref2} getform1={getform1} total={total} goback={goback} />
+                <Basfrom ref={ceshiref2}  total={total} goback={goback} />
               </div>
             </div>
             <div className='newadd_footer'>
