@@ -18,6 +18,7 @@ interface State {
 const Activity=(props:any)=>{
     const {tabname,activityName,queryStartDate,queryEndDate}=props
     const[loading,setLoading]=useState(true)
+    const [bianji,setBianji]=useState(false)
     const columns = [
         {
           title: '活动名称',
@@ -85,6 +86,7 @@ const Activity=(props:any)=>{
                 
               <Space size="middle">
                 <div style={{color:"#1585FF"}} onClick={()=>{gotolist(record)}}>详情</div>
+                {bianji&& <div style={{color:"#1585FF"}} onClick={()=>{goactive(record)}}>编辑</div>}
               </Space>
             ),
           },
@@ -121,6 +123,7 @@ const Activity=(props:any)=>{
             obj.activityStatus=[]
         }else if(tabname==="6"){
             obj.isDraft=1
+            setBianji(true)
         }
         else{
             obj.activityStatus=[Number(tabname)]
@@ -199,6 +202,13 @@ const Activity=(props:any)=>{
         console.log("详情",record);
         history.push({
             pathname:'/active/details',
+            query:{activityBasicId:record.key}
+        })
+    }
+    const goactive=(record:any)=>{
+        console.log("编辑",record);
+        history.push({
+            pathname:'/active/newadd',
             query:{activityBasicId:record.key}
         })
     }

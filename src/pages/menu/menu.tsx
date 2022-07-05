@@ -1,5 +1,5 @@
-import {DownOutlined, MailOutlined } from '@ant-design/icons';
-import { Layout, Menu,Dropdown,Space,Avatar,Image,message } from 'antd';
+import { MailOutlined } from '@ant-design/icons';
+import { Menu } from 'antd';
 import type { MenuProps } from 'antd';
 import { history,useLocation } from "umi";
 import React,{useEffect,useState} from 'react';

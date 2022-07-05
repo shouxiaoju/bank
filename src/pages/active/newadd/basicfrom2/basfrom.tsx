@@ -1,18 +1,24 @@
-import { useState,forwardRef,useImperativeHandle } from "react"
-import { Collapse, Select,Col, Row,Form,Input,DatePicker,Button,Upload } from 'antd';
-import { PlusOutlined ,LoadingOutlined,MinusCircleOutlined,DeleteOutlined} from '@ant-design/icons'
-import type { UploadChangeParam } from 'antd/es/upload';
+import { useState,forwardRef,useImperativeHandle, useEffect } from "react"
+import { history } from "umi";
+import { Collapse, Select , Col , Row , Form ,Input , DatePicker , Button , Upload , Modal , message} from 'antd';
+import { PlusOutlined,MinusCircleOutlined,DeleteOutlined,CloseOutlined} from '@ant-design/icons'
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
 import 'moment/locale/zh-cn';
 import locale from 'antd/es/date-picker/locale/zh_CN';
-import Check from "./checkbox/checkbox";
 import './index.less'
-import {CloseOutlined} from '@ant-design/icons';
-const { RangePicker }:any = DatePicker;
-const { Panel } = Collapse;
-const { Option } = Select;
+import Check from "./checkbox/checkbox";
+import { addactivitylist,addasaveDrafts } from "@/api/activeapi";
+import moment from 'moment';
+    const { RangePicker }:any = DatePicker;
+    const { Panel } = Collapse;
+    const { Option } = Select;
+
 const Basfrom=(props:any,ref:any)=>{
-    const {getform1}=props
+    const {total,goback}=props
+  
+
+
+
     /* 展示对应列表 */
     const [icon,setIcon]=useState([])
     const dianji=(lab:any)=>{
@@ -24,8 +30,8 @@ const Basfrom=(props:any,ref:any)=>{
               return arr
             })
         }
-        
     }
+    /* 隐藏对应的列表 */
     const react=(key:any)=>{
         if(icon.includes(key)){
           let arr= icon.filter((item)=>{
@@ -34,78 +40,233 @@ const Basfrom=(props:any,ref:any)=>{
             setIcon(arr)
         }
     }
-  
-    const onChange = (key: any) => {
-        console.log(key);
-    };
-    /* 表单1 */
-    const [form] = Form.useForm();
-    useImperativeHandle(ref,()=>{
+    
+    useEffect(()=>{
+        settotaldata((predata:any)=>{
+            let arr={...predata}
+            arr["isSignUp"]=icon.includes("1")?true:false 
+            arr["isVote"]= icon.includes("2")?true:false
+            arr["isRobTickets"]= icon.includes("3")?true:false
+            arr["isSignIn"]= icon.includes("4")?true:false
+            arr["isLuckyDraw"]= icon.includes("5")?true:false
+           return arr
+        })
+    },[icon])
+
+
+
+    /* 表单2-1 */
+    const [form1] = Form.useForm();
+    const [form2]=Form.useForm()
+    const [totaldata,settotaldata]:any=useState({})
+
+    useImperativeHandle(ref,()=>{//暴露给父组件的方法用来触发表单提交
         return {
             submit
         }
     })
-    const submit=()=>{
-        form.validateFields().then((value)=>{
-            console.log("validateFields",value);
-
+    /* 得到表单1中的数据 */
+    useEffect(()=>{
+        settotaldata((perdata:any)=>{
+            let arr={...perdata,...total}
+            return arr
         })
-        .catch((errorInfo)=>{
-            console.log("errorInfo",errorInfo);
-            
+    },[total])
+
+     function  submit(key:any){
+         console.log("提交",key);
+         
+        let arr=[]
+        for(let i=0;i<icon.length;i++){
+            if(icon[i]==="1"){
+                arr.push(form1.validateFields())
+            }else if(icon[i]==="2"){
+                arr.push(form2.validateFields())
+            }
+        }
+        Promise.all(arr).then((res)=>{
+            console.log("promise.all",res);
+            let newarr={...totaldata}
+            for(let i=0;i<res.length;i++){
+                if(res[i]["activityName"]){
+                    let arr1:any=[]
+                    res[0].check.checkcount.length>0?res[0].check.checkcount.map((item:any)=>{
+                        arr1.push({
+                            "key":item,
+                        })
+                    }):""
+                    let arr2:any=[{
+                        key:res[0].activityName
+                    }]
+                    res[0].users? res[0].users.map((item:any)=>{
+                        arr2.push({
+                            "key":item.first,
+                        })
+                    }):""
+                    newarr["activityVOS"]=newarr["activityVOS"]?[...newarr.activityVOS]:[]
+                        newarr["activityVOS"].push({
+                            "activityType": 1,
+                            "startDate": formatDateTime(res[0].datatime[0]._d),
+                            "endDate": formatDateTime(res[0].datatime[1]._d),
+                            "numberLimit":Number(res[0].catynum),
+                            "requiredEntryForms":arr1,
+                            "optionalEntryForms":arr2
+                        })
+                    console.log("表单2-1处理后的数据",newarr);
+                }else if(res[i]["ovceName"]){
+                    let arr1:any=[{
+                        "instructions": res[i].ovceSey,
+                         "pictureKey": res[i].ovceImg[0].response.data.imgKey,
+                        "pictureUrl": res[i].ovceImg[0].response.data.imgUrl,
+                        "name": res[i].ovceName,
+                    }]
+                    res[i].users?res[i].users.map((item:any)=>{
+                        arr1.push({
+                            "instructions": item.true,
+                            "pictureKey": item.three[0].response.data.imgKey,
+                            "pictureUrl": item.three[0].response.data.imgUrl,
+                            "name": res[i].one,
+                        })
+                    }):""
+                    newarr["activityVOS"]=newarr["activityVOS"]?[...newarr.activityVOS]:[]
+                  
+                        newarr["activityVOS"].push({
+                            "activityType": 2,
+                            "startDate": formatDateTime(res[i].ovteTime[0]._d),
+                            "endDate": formatDateTime(res[i].ovteTime[1]._d),
+                            "voteWay": res[i].ovteWay,
+                            "voteObjectVOS":arr1
+                        })
+                    console.log("表单2-2处理后的数据",newarr);
+                }
+            }
+
+            console.log("表单处理后的总数据",newarr);
+            if(key==="发布"){
+                addactivitylist(newarr).then((res):any=>{
+                    console.log("新增成功",res);
+                    const{data:{code}}=res
+                    if(code===200){
+                        message.success('发布成功')
+                        history.push({
+                            pathname:'/active'
+                        })
+                    }else{
+                        message.error(res.data.message);
+                    }
+                    
+                }).catch((erray):any=>{
+                    console.log("新增失败",erray);
+                })
+            }else if(key==="保存草稿"){
+                addasaveDrafts(newarr).then((res):any=>{
+                    console.log("保存草稿成功",res);
+                    const{data:{code}}=res
+                    if(code===200){
+                        message.success('保存草稿箱成功')
+                        history.push({
+                            pathname:'/active'
+                        })
+                    }else{
+                        message.error(res.data.message);
+                    }
+                }).catch((erray):any=>{
+                    console.log("保存草稿成功",erray);
+                    
+                })
+            }
         })
     }
-    const onFinish = (values: any) => {
-        console.log('Success:', values);
-    };
-    
-    const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
-    };
+    /* 处理日期 */
+    const formatDateTime = function (date:any) {
+        let y = date.getFullYear(); 
+        let m = date.getMonth() + 1;  
+        m = m < 10 ? ('0' + m) : m;  
+        let d = date.getDate();  
+        d = d < 10 ? ('0' + d) : d;  
+        let h = date.getHours();  
+        h=h < 10 ? ('0' + h) : h;  
+        let minute = date.getMinutes();  
+        minute = minute < 10 ? ('0' + minute) : minute;  
+        let second=date.getSeconds();  
+        second=second < 10 ? ('0' + second) : second;  
+        return y + '-' + m + '-' + d+' '+h+':'+minute; 
+    }
 
-
-
-      /* 图片 */
-    const getBase64 = (img: RcFile, callback: (url: string) => void) => {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => callback(reader.result as string));
-        reader.readAsDataURL(img);
-      };
-    const [loading2, setLoading2] = useState(false);
-    const [imageUrl2, setImageUrl2] = useState<string>();
-
+    /* 图片 */
+    const getBase64 = (file: RcFile): Promise<string> =>
+        new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = error => reject(error);
+        });
+    /* 处理上传组件报错 */
     const normFile = (e:any) => {  //如果是typescript, 那么参数写成 e: any
-        console.log('Upload event:', e);
         if (Array.isArray(e)) {
-          return e;
+            return e;
         }
         return e && e.fileList;
-      };
-    const handleChange2: UploadProps['onChange'] = (info: UploadChangeParam<UploadFile>) => {
-        console.log("info",info);
-        
-      if (info.file.status === 'uploading') {
-        setLoading2(true);
-        return;
-      }
-      if (info.file.status === 'done') {
-        // Get this url from response in real world.
-        getBase64(info.file.originFileObj as RcFile, url => {
-          setLoading2(false);
-          setImageUrl2(url);
-        });
-      }
-      if (info.file.status === 'removed'){
-        setImageUrl2("")
-      }
     };
-  
-    const uploadButton2 = (
+    const [previewVisible, setPreviewVisible] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [previewTitle, setPreviewTitle] = useState('');
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const handleCancel = () => setPreviewVisible(false);
+    const handlePreview = async (file: any) => {
+      if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj as RcFile);
+      }
+      setPreviewImage(file.url || (file.preview as string));
+      setPreviewVisible(true);
+      setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1));
+    };
+    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
+      setFileList(newFileList);
+    const uploadButton = (
       <div>
-        {loading2 ? <LoadingOutlined /> : <PlusOutlined />}
+        <PlusOutlined />
         <div style={{ marginTop: 8 }}>Upload</div>
       </div>
     );
+
+
+      /* 回填 */
+      useEffect(()=>{
+          
+        console.log("表单2回填",goback);
+        if(goback["isSignUp"]){
+            if(goback.isSignUp){
+                setIcon((pericon):any=>{
+                    let arr=[...pericon]
+                    arr.push("1")
+                  return arr
+                })
+                
+            }
+             if(goback.isVote){
+                setIcon((pericon):any=>{
+                    let arr=[...pericon]
+                    arr.push("2")
+                  return arr
+                })
+              }
+            
+        }
+      },[goback])
+    const onChange = (key: any) => {
+        console.log(key);
+        let obj1:any={}
+        let newarr:any=[]
+                goback.activityVOS[0].requiredEntryForms.map((item:any)=>{
+                    newarr.push(item.key)
+                })
+                obj1["datatime"]=[moment(goback.activityVOS[0].startDate),moment(goback.activityVOS[0].endDate)]
+                obj1["catynum"]=goback.activityVOS[0].numberLimit
+                obj1["check"]= newarr,
+                
+                form1.setFieldsValue(obj1)
+    };
     return(
         <div className="basfrom">
             <div className="basfrom_title">选择你想要创建的活动
@@ -153,9 +314,7 @@ const Basfrom=(props:any,ref:any)=>{
                     <Row>
                         <Form
                             name="basic1"
-                            form={form}
-                            onFinish={onFinish}
-                            onFinishFailed={onFinishFailed}
+                            form={form1}
                             autoComplete="off"
                             layout="vertical"
                             initialValues={{
@@ -191,7 +350,7 @@ const Basfrom=(props:any,ref:any)=>{
                             </Col>
                             <Row className="basfrom_col">
                                 <Col span={24}>
-                                    <Form.Item name="check" label=" " className="basfrom_fromitem">
+                                    <Form.Item name="check"  className="basfrom_fromitem">
                                         <Check />
                                     </Form.Item>
                                 </Col>
@@ -203,7 +362,8 @@ const Basfrom=(props:any,ref:any)=>{
                                 <Col span={24}>
                                     <Form.Item
                                        name="activityName" 
-                                       label="项目名称"                    
+                                       label="项目名称"
+                                       rules={[{ required: true, message: '请输入项目名称' }]}                    
                                     >
                                         <Input placeholder="请输入项目名称" />
                                     </Form.Item>
@@ -243,8 +403,7 @@ const Basfrom=(props:any,ref:any)=>{
                 <Row>
                         <Form
                             name="basic2"
-                            /* onFinish={onFinish}
-                            onFinishFailed={onFinishFailed} */
+                            form={form2}
                             autoComplete="off"
                             layout="vertical"
                         >
@@ -254,7 +413,7 @@ const Basfrom=(props:any,ref:any)=>{
                             <Row className="basfrom_col">
                                 <Col span={12}>
                                     <Form.Item
-                                        label="名称"
+                                        label="活动时间"
                                         name="ovteTime"
                                         rules={[{ required: true, message: '请选择活动时间' }]}
                                     >
@@ -271,7 +430,7 @@ const Basfrom=(props:any,ref:any)=>{
                                             placeholder="请选择投票方式"
                                             allowClear
                                         >
-                                            <Option value="只可投一次">只可投一次</Option>
+                                            <Option value="1">只可投一次</Option>
                                             <Option value="female">female</Option>
                                             <Option value="other">other</Option>
                                         </Select>
@@ -305,19 +464,23 @@ const Basfrom=(props:any,ref:any)=>{
                                         label="图片" 
                                         valuePropName="fileList" 
                                         getValueFromEvent={normFile}
-                                        rules={[{ required: true, message: '请上传图片' }]}                    
+                                        rules={[{ required: true, message: '请上传图片' }]}  
+                                        extra={
+                                            <Modal visible={previewVisible} title={previewTitle} footer={null} onCancel={handleCancel}>
+                                                <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                                            </Modal>
+                                        }                    
+                                    >
+                                        <Upload
+                                            name="multipartFile"
+                                            action="/campus/campusweb/upload/pictureUpload"
+                                            listType="picture-card"
+                                            fileList={fileList}
+                                            onPreview={handlePreview}
+                                            onChange={handleChange}
                                         >
-                                            <Upload
-                                                name="avatar"
-                                                listType="picture-card"
-                                                className="avatar-uploader"
-                                                showUploadList={false}
-                                                onChange={handleChange2}
-                                            >
-                                                {imageUrl2 ?
-                                                    <img src={imageUrl2}  style={{ width: '100%' }} />
-                                                : uploadButton2}
-                                            </Upload>
+                                            {fileList.length >= 1 ? null : uploadButton}
+                                        </Upload>
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -328,10 +491,10 @@ const Basfrom=(props:any,ref:any)=>{
                                             <Row key={key} className="basfrom_col">
                                             <Col span={12}>
                                                 <Form.Item
-                                                {...restField}
-                                                name={[name, 'one']} 
-                                                label="名称"   
-                                                rules={[{ required: true, message: '请输入投票对象的名字' }]}                 
+                                                    {...restField}
+                                                    name={[name, 'one']} 
+                                                    label="名称"   
+                                                    rules={[{ required: true, message: '请输入投票对象的名字' }]}                 
                                                 >
                                                     <Input placeholder="请输入投票对象的名字" />
                                                 </Form.Item>
@@ -341,8 +504,8 @@ const Basfrom=(props:any,ref:any)=>{
                                                     {...restField}
                                                     name={[name, 'true']} 
                                                     label="说明"                    
-                                                    >
-                                                        <Input placeholder="请输入投票对象的说明" />
+                                                >
+                                                    <Input placeholder="请输入投票对象的说明" />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={24}>
@@ -352,19 +515,23 @@ const Basfrom=(props:any,ref:any)=>{
                                                     label="图片" 
                                                     valuePropName="fileList" 
                                                     getValueFromEvent={normFile}
-                                                    rules={[{ required: true, message: '请上传图片' }]}                    
+                                                    rules={[{ required: true, message: '请上传图片' }]}  
+                                                    extra={
+                                                        <Modal visible={previewVisible} title={previewTitle} footer={null} onCancel={handleCancel}>
+                                                            <img alt="example" style={{ width: '100%' }} src={previewImage} />
+                                                        </Modal>
+                                                    }                  
+                                                >
+                                                    <Upload
+                                                        name="multipartFile"
+                                                        action="/campus/campusweb/upload/pictureUpload"
+                                                        listType="picture-card"
+                                                        fileList={fileList}
+                                                        onPreview={handlePreview}
+                                                        onChange={handleChange}
                                                     >
-                                                        <Upload
-                                                            name="avatar"
-                                                            listType="picture-card"
-                                                            className="avatar-uploader"
-                                                            showUploadList={false}
-                                                            onChange={handleChange2}
-                                                        >
-                                                            {imageUrl2 ?
-                                                                <img src={imageUrl2}  style={{ width: '100%' }} />
-                                                            : uploadButton2}
-                                                        </Upload>
+                                                        {fileList.length >= 2 ? null : uploadButton}
+                                                    </Upload>
                                                 </Form.Item>
                                             </Col>
                                                 <Col span={24} className="over_colicon">

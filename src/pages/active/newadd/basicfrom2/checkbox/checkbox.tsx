@@ -1,26 +1,31 @@
 import { Button, Space } from 'antd';
 import React,{useState} from 'react';
 import "./check.less"
-const Check=()=>{
 
+
+const Check=(props:any )=>{
+    const {value = [],onChange }:any=props
     const [checkcount,setCheckcount]=useState([])
-
+    const triggerChange = (changedValue: { checkcount?: any; }) => {      
+        onChange ?.({ checkcount, ...value, ...changedValue });
+    };
     const check=(name:any)=>{
         let flag=checkcount.indexOf(name)
         if(flag===-1){
             setCheckcount((preount):any=>{
                 let arr=[...preount]
                 arr.push(name)
+                triggerChange({checkcount:arr})
                 return arr
             })
         }else{
             setCheckcount((preount):any=>{
                 let arr=[...preount]
                 arr.splice(flag,1)
+                triggerChange({checkcount:arr})
                 return arr
             })
         }
-        
     }
     return (
         <Space size={[12, 12]} wrap className="check">

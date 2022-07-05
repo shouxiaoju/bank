@@ -92,3 +92,27 @@ export function activitylist(query:any){
       data: query
     })       
 }
+
+/* 创建活动 */
+
+export function addactivitylist(query:any){
+   
+  return axios({
+      method: 'post',
+      url: '/activity/addActivity',
+      baseURL: "/campus/campusweb",
+      data: query
+    })       
+}
+
+/*保存草稿  /activity/saveDrafts*/
+
+export function addasaveDrafts(query:any){
+   
+  return axios({
+      method: 'post',
+      url: '/activity/saveDrafts',
+      baseURL: "/campus/campusweb",
+      data: query
+    })       
+}
