@@ -74,7 +74,6 @@ const Activity=(props:any)=>{
                         col="#FE4D5C"
                         tex="已结束"
                         break;
-                    
                 }
                return <div style={{color:`${col}`}}>{tex}</div>
             } ,
@@ -83,14 +82,12 @@ const Activity=(props:any)=>{
             title: '操作',
             key: 'action',
             render: (_:any, record:any) => (
-                
               <Space size="middle">
                 <div style={{color:"#1585FF"}} onClick={()=>{gotolist(record)}}>详情</div>
                 {bianji&& <div style={{color:"#1585FF"}} onClick={()=>{goactive(record)}}>编辑</div>}
               </Space>
             ),
           },
-       
     ];
       /* 列表数据 */
     const [data,setData]=useState([{
@@ -121,6 +118,7 @@ const Activity=(props:any)=>{
         }
         if(tabname==="0"){
             obj.activityStatus=[]
+            setBianji(false)
         }else if(tabname==="6"){
             obj.isDraft=1
             setBianji(true)
@@ -128,6 +126,7 @@ const Activity=(props:any)=>{
         else{
             obj.activityStatus=[Number(tabname)]
             obj.isDraft=0
+            setBianji(false)
         }
         getlist(obj)
     },[tabname,activityName,queryStartDate,queryEndDate])
@@ -136,6 +135,8 @@ const Activity=(props:any)=>{
     /* 调用接口 */
     const getlist=(obj:any)=>{
         activity(obj).then(res=>{
+            console.log("列表数据",res);
+            
             const {data:{code}}=res
             if(code===200){
                 const {data:{data:{rows,total}}}=res
