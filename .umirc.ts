@@ -30,7 +30,14 @@ export default defineConfig({
         { path: '/luck', 
           component: '@/pages/luck/luck',
           auth:true,
-          title:"抽奖白名单"
+          title:"抽奖白名单",
+          routes:[
+            { path: '/luck/addluck', 
+              component: '@/pages/luck/newluck/addluck',
+              auth:true,
+              title:"设置白名单"
+            },
+          ],
         },
         { path: '/comment', 
           component: '@/pages/comment/comment',

@@ -116,3 +116,47 @@ export function addasaveDrafts(query:any){
       data: query
     })       
 }
+
+/* 获取白名单列表 */
+export function getluck(query:any){
+   
+  return axios({
+      method: 'post',
+      url: '/activity/pageConditionQueryActivityByCreatorId ',
+      baseURL: "/campus/campusweb",
+      data: query
+    })       
+}
+
+/* 获取白名单详情 */
+export function getlucklist(query:any){
+   
+  return axios({
+      method: 'post',
+      url: '/activity/queryByActivityBasicId ',
+      baseURL: "/campus/campusweb",
+      data: query
+    })       
+}
+
+/* 白名单列表查询 */
+export function gecandidatelist(query:any){
+   
+  return axios({
+      method: 'post',
+      url: '/activity/candidate/pageByCandidateQuery ',
+      baseURL: "/campus/campusweb",
+      data: query
+    })       
+}
+
+/* 下载 */
+export function lucktemplate(){
+   
+  return axios({
+      method: 'post',
+      url: '/activity/candidate/downloadCandidateTemplate',
+      baseURL: "/campus/campusweb",
+      //data: query
+    })       
+}

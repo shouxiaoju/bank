@@ -12,11 +12,14 @@ import { history } from "umi";
 const Active=(props:any)=>{
     
     const {location:{pathname},route}=props
-    const[tabname,setTabname]=useState("0")
+    const[tabname,setTabname]:any=useState("0")
     const[activityName,setActivityName]=useState("")
     const[queryStartDate,setQueryStartDate]=useState("")
     const[queryEndDate,setQueryEndDate]=useState("")
 
+    useEffect(()=>{
+      let tex= tabname?tabname:"0"
+    },[])
     /* 切换 */
     const onChange = (key: any) => {
         setTabname(key)

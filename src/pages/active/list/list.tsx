@@ -4,11 +4,6 @@ import { Space, Table, Tag } from 'antd';
 import { useSetState } from 'ahooks';
 import { history } from "umi";
 interface State {
-    /* [activityStatus: number]: any;
-    activityName:string,
-    queryStartDate:string,
-    queryEndDate:string,
-            activityStatus:array, */
     page:number,
     pageSize:number,
     isDraft:number,
@@ -98,12 +93,6 @@ const Activity=(props:any)=>{
         key: '',
         activityStatus:"1"
     }])
-    /* 分页配置 */
-    const [listobj,setListobj]=useSetState<State>({
-            page:1,
-            pageSize:10,
-            isDraft:0
-    })
     /* 加载数据 */
       useEffect(()=>{
         setLoading(true)
@@ -116,6 +105,7 @@ const Activity=(props:any)=>{
             pageSize:10,
             isDraft:0
         }
+        
         if(tabname==="0"){
             obj.activityStatus=[]
             setBianji(false)
