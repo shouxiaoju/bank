@@ -69,6 +69,9 @@ const Theme=(props:any)=>{
     const data=islogin?JSON.parse(islogin):""
     const {location:{pathname},route}=props
     const [titlename,setTitlename]=useState([])
+    
+
+
     let dizhi= pathname.split("/")
     const onadd=(key:string)=>{
         setTitlename((pretit):any=>{
@@ -135,7 +138,7 @@ const Theme=(props:any)=>{
                 }}
             >
                 <div className="logo">秦学后台管理</div>
-                <Menubar onadd={onadd}/>
+                <Menubar onadd={onadd} />
             </Sider>
             <Layout className="site-layout" style={{ marginLeft: 200 ,height:"100%"}}>
                 <Header className="site-layout-background" style={{ padding: 0 }} >

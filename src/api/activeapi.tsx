@@ -157,6 +157,18 @@ export function lucktemplate(){
       method: 'post',
       url: '/activity/candidate/downloadCandidateTemplate',
       baseURL: "/campus/campusweb",
-      //data: query
+      responseType: "blob" 
+     
+    })       
+}
+
+/* 导入 */
+export function uplucktemplate(query:any){
+   
+  return axios({
+      method: 'post',
+      url: '/activity/candidate/importCandidates',
+      baseURL: "/campus/campusweb",
+      data: query
     })       
 }

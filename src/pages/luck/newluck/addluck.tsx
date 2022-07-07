@@ -1,7 +1,8 @@
 import React,{useState,useEffect} from "react"
 import './addluck.less'
-import { getlucklist,gecandidatelist ,lucktemplate} from "@/api/activeapi"
-import { Row,Col, Form, Table,Input ,Button,Space} from 'antd';
+import type { UploadProps } from 'antd';
+import { getlucklist,gecandidatelist ,lucktemplate,uplucktemplate} from "@/api/activeapi"
+import { Row,Col, Form, Table,Input ,Button,Space,message,Upload} from 'antd';
 import type { ColumnsType } from 'antd/lib/table';
 import { useSetState } from 'ahooks';
 
@@ -138,24 +139,76 @@ const Addluck=(props:any)=>{
         }
         getaddlick(obj)
     }
+    /* 点击分页触发 */
+
+    const handleTableChange = (newPagination:any) => {
+        console.log(newPagination);
+        const {current,pageSize} = newPagination
+        
+        let obj={
+            activityBasicId:query.activityBasicId,
+            activityName:userName,
+            activityStatu:mobile,
+            page:current,
+            pageSize:pageSize
+        }
+         
+         getaddlick(obj)
+         setPagination({"current":current,"pageSize":pageSize})
+    }
+
+
+
     /* 下载 */
     const template=()=>{
-        lucktemplate().then((res)=>{
+        lucktemplate().then((res:any)=>{
             console.log("下载",res);
-            const blob = new Blob([res], {
-                type: "application/vnd.ms-excel;charset=utf-8",
-              });
-              const fileName = '下载模板.xls';
-              const elink = document.createElement('a');
-              elink.download = fileName;
-              elink.style.display = 'none';
-              elink.href = URL.createObjectURL(blob);
-              document.body.appendChild(elink);
-              elink.click();
-              URL.revokeObjectURL(elink.href); // 释放URL 对象
-              document.body.removeChild(elink);
+            let headers=res.headers;
+            let contentType=headers["content-type"]
+            const blob = new Blob([res.data], { type: contentType });
+            const contentDisposition = res.headers["content-disposition"];
+            let fileName = "白名单模板.xlsx";
+            if (contentDisposition) {
+                fileName = window.decodeURIComponent(window.decodeURI(
+                    res.headers["content-disposition"].split("=")[1]
+                ));
+            }
+            downFile(blob,fileName)
         })
+        .catch(function (error) {
+            console.log(error);
+        });
     }
+    const downFile=(blob:any, fileName:any)=> {
+        // 非IE下载
+        if ("download" in document.createElement("a")) {
+            let link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob); // 创建下载的链接
+            link.download = fileName; // 下载后文件名
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click(); // 点击下载
+            window.URL.revokeObjectURL(link.href); // 释放掉blob对象
+            document.body.removeChild(link); // 下载完成移除元素
+        } else {
+            // IE10+下载
+           // window.navigator.msSaveBlob(blob, fileName);
+        }
+    }
+    /* 上传 */
+    const propsdata: UploadProps = {
+        name: 'file',
+        action: '/campus/campusweb/activity/candidate/importCandidates',
+        showUploadList:false,
+        data:(file) =>{
+            console.log("file",file);
+            
+            return {
+                file,
+                activityBasicId:query.activityBasicId,
+            }
+        }
+      };
     return (
         <div className="addluck">
             <div className="addluck_title">设置白名单</div>
@@ -206,7 +259,9 @@ const Addluck=(props:any)=>{
                 </Row>
             </Form>
             <Space size={20} style={{marginBottom:"10px"}}>
-                <Button className='addluck_but'>导入</Button>
+                <Upload {...propsdata}>
+                    <Button className='addluck_but'>导入</Button>
+                </Upload>
                 <Button>删除</Button>
                 <span style={{color:"#1585FF"}} onClick={template}>下载导模板</span>
                 <span style={{color:"#1585FF"}}>查看导入进度</span>
@@ -217,6 +272,7 @@ const Addluck=(props:any)=>{
                 dataSource={datalist} 
                 loading={loading} 
                 pagination={pagination} 
+                onChange={handleTableChange} 
             />
 
 

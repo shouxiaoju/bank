@@ -28,8 +28,28 @@ function getItem(
     const{onadd}=props
     const [openKeys, setOpenKeys] = useState(['sub1']);
     const [datalist,setDatalist]=useState([])
-    const [defitem,setDefitem]=useState(["234765385696768976"])
+    
     const {pathname}=useLocation()
+    
+    const [defitem,setDefitem]=useState([])
+
+    useEffect(()=>{
+        if(pathname.split("/").includes("luck")){
+       
+          setDefitem(["102"])
+        }  
+        if(pathname.split("/").includes("active")){
+          
+          setDefitem(["234765385696768976"])
+        }    
+        if(pathname.split("/").includes("comment")){
+         
+          setDefitem(["344547686666666649"])
+        }
+  
+      },[])
+    
+
     useEffect(()=>{
         let menulist:any=[]
         firstmenu().then(res=>{
@@ -52,6 +72,7 @@ function getItem(
                 setDatalist(list)
             })
         }
+        console.log("当前地址",pathname.split("/"));
     }
     /* 处理获取到的菜单数据生产左侧菜单 */
     const items: MenuItem[] = datalist.map((item:any,index:any)=>{
@@ -75,16 +96,19 @@ function getItem(
       
       if(key==="102"){
         onadd("抽奖白名单")
+        setDefitem(["102"])
         history.push({
           pathname:'/luck'
         })
       }else if(key==="234765385696768976"){
         onadd("创建活动")
+        setDefitem(["234765385696768976"])
         history.push({
           pathname:'/active'
         })
       }else if(key==="344547686666666649"){
         onadd("活动评论")
+        setDefitem(["344547686666666649"])
         history.push({
           pathname:'/comment'
         })
@@ -95,11 +119,11 @@ function getItem(
             theme="dark" 
             mode="inline" 
             openKeys={openKeys} 
-            defaultSelectedKeys={defitem} 
+            /* defaultSelectedKeys={defitem}  */
             items={items} 
             onOpenChange={onOpenChange}
             onClick={onmenuclick}
-            /* selectedKeys={defitem} */
+            selectedKeys={defitem}
         />
     )
   }
